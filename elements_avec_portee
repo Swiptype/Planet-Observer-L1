@@ -1,0 +1,273 @@
+import random
+import time
+
+class Element:
+    ids_count = 0
+    
+    def __init__(self, name, char_repr):
+        self.__name = name
+        self.__id = self.ids_count
+        self.__char_repr = char_repr
+        Element.ids_count += 1
+
+    def get_name(self):
+        return self.__name
+
+    def get_id(self):
+        return self.__id
+
+    def get_char_repr(self):
+        return self.__char_repr
+
+    def __repr__(self):
+        return f"{self.__char_repr} : {self.__name} {self.get_id()}"
+
+    def __eq__(self, other):
+        return type(self) is type(other)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+
+class Animal(Element):
+    age = 0
+    bar_life = [0,0]
+    current_direction = [0,0]
+    race = ''
+    evenements = ["Tornade,Seisme,Tsunami,Eruption volcanique,Meteorites,Manifestation d'animaux"]
+
+    def __init__(self,name,char_repr,life_max,race,degats):
+        super().__init__(name, char_repr)
+        self.life_max = life_max
+        self.life = life_max
+        Animal.bar_life[0] = self.life
+        Animal.bar_life[1] = life_max
+        self.gender = random.randint(0, 1)
+        self.race = race
+        self.degats = degats
+
+    def get_age(self):
+        return f"{self.get_gender()} de {self.age} an(s)"
+
+    def ageing(self):
+        Animal.age += 1
+
+    def get_gender(self):
+        if self.gender == 0:
+            return f'Femelle'
+        if self.gender == 1:
+            return f'Male'
+
+    def get_life_max(self):
+        return self.life_max
+
+    def get_life(self):
+        return self.life
+
+    def is_alive(self):
+        return self.get_life() > 0
+
+    def is_dead(self):
+        return not self.is_alive()
+
+    def recovering_life(self, value):
+        #self.bar_life[0] = min(self.bar_life[0] + value, self.bar_life[1])
+        Animal.bar_life[0] += value
+
+    def losing_life(self, value):
+        #self.bar_life[0] = max(self.bar_life[0] - value, 0)
+        Animal.bar_life[0] -= value
+
+    def get_current_direction(self):
+        return Animal.current_direction
+
+    def set_current_direction(self,line_direction,column_direction):
+        Animal.current_direction = [line_direction,column_direction]
+
+    def __repr__(self):
+        return f"{self.get_char_repr()} : {self.get_name()} ID {self.get_id()} {self.get_age()}\n - Barre de vie : {self.bar_life}"
+
+    def apparition_animal(self, autre_animal):
+        portee = random.randint(1, 12)
+        if self.race == autre_animal.race:
+            if self.race == "Lion" and autre_animal.race =="Lion":
+                plus_animal = Lion()
+            if self.race == "Mouse" and autre_animal.race == "Mouse":
+                plus_animal = Mouse()
+            if self.race == "Dragon"and autre_animal.race =="Dragon":
+                plus_animal = Dragon()
+            if self.race == "Cow" and autre_animal.race =="Cow":
+                plus_animal = Cow()
+            if self.race == "Serpent" and autre_animal.race =="Serpent":
+                plus_animal = Serpent()
+            if self.race == "Lapin" and autre_animal.race == "Lapin":
+                plus_animal = Portee()
+            if plus_animal == Portee():
+                print("L'accouplement à donné naissance à une portée de",portee,"lapin(s)")
+            else:
+                print("Nouvel animal :\n", plus_animal)
+        else:
+            return f"Les 2 animaux sont incapables de s'accoupler"
+
+
+"""
+    def sauvetage(animal1,animal2):
+        value = random.randint(0, 1)
+        if value == 0:
+            break;
+        else:
+            for i in range(5):
+                print(animal1.get_name()," s'est échappé grâce à ",evenements[i])
+
+
+    def duel(self,animal1,animal2):
+        sauvetage(animal1,animal2)
+        while (animal1.bar_life[1] > 0 or animal2.bar_life[1] > 0):
+            animal2.bar_life[0] = animal2.bar_life[0] - animal1.degats
+            if animal2.life_max <= 0:
+                print(animal2.get_name()," est mort")
+                break;
+            if animal1.life_max <= 0:
+                print(animal1.get_name()," est mort")
+                break;
+"""
+
+class Mouse(Animal):
+    def __init__(self):
+        super().__init__("Mouse","\U0001F42D",2,"Mouse",1)
+    
+class Lion(Animal):
+    race = "Lion"
+    def __init__(self):
+        super().__init__("Lion","\U0001F981",10,"Lion",7.5)
+
+class Dragon(Animal):
+    def __init__(self):
+        super().__init__("Dragon","\U0001F432",20,"Dragon",9)
+
+class Cow(Animal):
+    def __init__(self):
+        super().__init__("Cow","\U0001F42E",5,"Cow",3)
+
+""" Ajout de quelques animaux supplémentaires :"""
+
+class Serpent(Animal):
+    def __init__(self):
+        super().__init__("Serpent","\U0001F40D",5,"Serpent",2.5)
+
+class Lapin(Animal):
+    def __init__(self):
+        super().__init__("Lapin","\U0001f430",2.5,"Lapin",0.5)
+
+class Portee(Animal):
+    def __init__(self):
+        self.portee = random.randint(1, 12)
+        super().__init__("Portee", "\U0001F42D", 1, "Lapin", 0)
+        self.lapins = []
+
+        def __repr__(self):
+            return f"L'accouplement a donné une portée de {self.portee} lapins"
+
+        for i in range(self.portee):
+            lapin = Lapin()
+            self.lapins.append(lapin)
+            
+class Ground(Element) :
+    def __init__(self):
+        super().__init__("Ground", ".")
+
+    def __repr__(self):
+        return f"{self.get_char_repr()} : {self.get_name()} {self.get_id()}"
+
+class Resource(Element) :
+    def __init__(self,name,char_repr,value):
+        super().__init__(name,char_repr)
+        self.__value = value
+
+    def get_value(self):
+        return self.__value
+
+    def __repr__(self):
+        return f"{self.get_char_repr()} : {self.get_name()} {self.get_id()} ({self.get_value()})"
+
+class Herb(Resource) :
+    def __init__(self):
+        super().__init__("Herb","\U0001F33F",1)
+        self.rect = self.image.get_rect()
+
+class Water(Resource):
+    def __init__(self):
+        super().__init__("Water","\U0001F41F",2)
+
+
+""" Ajout d'Humain :"""
+
+class Humain(Element) :
+    age = 0
+    gender = 0
+    bar_life = [0,0]
+    current_direction = [0,0]
+
+    def __init__(self,name,char_repr,life_max,race,degats):
+        super().__init__(name, char_repr)
+        self.life_max = life_max
+        self.life = life_max
+        Humain.bar_life[0] = self.life
+        Humain.bar_life[1] = life_max
+        self.gender = random.randint(0, 1)
+        self.race = race
+        self.degats = degats
+
+    def get_age(self):
+        return f"{self.get_gender()} de {self.age} an(s)"
+
+    def ageing(self):
+        Humain.age += 1
+
+    def get_gender(self):
+        if Humain.gender == 0:
+            return f'Femelle'
+        if Humain.gender == 1:
+            return f'Male'
+
+    def get_life_max(self):
+        return self.life_max
+
+    def get_life(self):
+        return self.life
+
+    def is_alive(self):
+        self.get_life() > 0
+
+    def is_dead(self):
+        return not self.is_alive()
+
+    def recovering_life(self, value):
+        #self.bar_life[0] = min(self.bar_life[0] + value, self.bar_life[1])
+        Humain.bar_life[0] += value
+
+    def losing_life(self, value):
+        #self.bar_life[0] = max(self.bar_life[0] - value, 0)
+        Humain.bar_life[0] -= value
+
+    def get_current_direction(self):
+        return Humain.current_direction
+
+    def set_current_direction(self,line_direction,column_direction):
+        Humain.current_direction = [line_direction,column_direction]
+
+    def __repr__(self):
+        return f"{self.get_char_repr()} : {self.get_name()} ID {self.get_id()} {self.get_age()}\n - Barre de vie : {self.bar_life}"
+
+    def apparition_humain(self,humain):
+        if self.race == "Humain" and humain.race == "Humain":
+            plus_humain = Homme()
+            print("Nouvel animal :\n", plus_humain)
+
+class Chevalier(Humain):
+    def __init__(self):
+        super().__init__("Chevalier", "\U0001F6E1",15,"Humain",10)
+
+class Homme(Humain):
+    def __init__(self):
+        super().__init__("Homme", "\U0001F64D",10,"Humain",5)
